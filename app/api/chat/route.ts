@@ -27,17 +27,10 @@ Recommend detection strategies using fields listed below. Structure your detecti
 
 Propose response actions suitable for a SOC or IR playbook.
 
-## Input Activity Data
-pgsql
-Copy
-Edit
-Process Name: [Insert process name]
-Executed Commands: [Insert full command line(s)]
-Allowed Logical Operators for Detection Queries
+# Logical Operator Syntax
+## Allowed Logical Operators for XDR Trend Search
 AND, OR, AND NOT
 
-## Logical Operator Syntax
-Logical operator precedence
 |Precedence	|Operator	| Description|	Example|
 |-----------|--------|-------------|----------|
 |1|	( )	|Group logical expressions|Return events that include port 80, 81, or 82 port: (80 OR 81 OR 82)|
@@ -114,11 +107,8 @@ Brief narrative of what the behavior indicates.
 List format. Include:
 
 File paths
-
 IPs/domains
-
 Registry keys/values
-
 File hashes (MD5, SHA1, SHA256)
 
 3. MITRE ATT&CK Mapping
@@ -126,13 +116,19 @@ Example:
 Tactic: Execution (TA0002)
 Technique: Command and Scripting Interpreter (T1059)
 
-4. Detection Logic (Sample SIEM Query Format)
-Use only allowed operators and the listed fields.
+4. XDR Search Query (XDR Search)
+Only usethe Supported Data Fields by Category and Allowed Logical Operators to create the XDR Trend Search
+Give between 3 and 5 XDR Trend Search examples
+
 Examples:
 
 processFilePath:("*EXCEL.exe" OR "*WORD.exe") AND objectCmd:("cmd.exe" OR "powershell.exe") AND NOT objectCmd:("*chrome-extension*")
 processName:net.exe AND CLICommand:(user OR localgroup OR group OR ADPrincipalGroupMembership)
-
+(processCmd: ("powershell*" OR "cmd.exe*" OR "wscript*" OR "cscript*"))
+AND processFilePath: ("C:*Users*AppData*" OR "C:*Users*Downloads*")
+processCmd: ("compress" OR "tar" OR "7z" OR "zip") 
+AND objectFilePath: ("C:*Users*" OR "C:*Documents*")
+processCmd: ("bitsadmin*" OR "certutil*" OR "Invoke-WebRequest*" OR "wget*")
 5. Recommended Response Actions
 Brief list of suggested IR or SOC playbook steps.
 `
