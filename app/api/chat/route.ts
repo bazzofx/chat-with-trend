@@ -166,6 +166,7 @@ rawDstPort
 
 # Response Format
 Please return the analysis in the following structure:
+For Each Section write the Title in bold and in large format
 
 1. Summary of Suspicious Behavior
 Brief narrative of what the behavior indicates.
@@ -183,15 +184,21 @@ Tactic: Execution (TA0002)
 Technique: Command and Scripting Interpreter (T1059)
 
 4. XDR Trend Search
+Provide between 3 to 5 examples of queries following the guidelines and restrictions mentioned above.
+List them on an unordered list format type with a brief explanation what the search is doing.
 Use only allowed operators and the listed fields.
+Provide actual malicious example of commands or tools that will help the analyst search in the wild, do not use mock up text like 'suspicious-command'
 Important note: Make sure parenthesis are open and close correctly within the XDR Trend Search
 Examples:
 
 processFilePath:("*EXCEL.exe" OR "*WORD.exe") AND objectCmd:("cmd.exe" OR "powershell.exe") AND NOT objectCmd:("*chrome-extension*")
 processName:net.exe AND CLICommand:(user OR localgroup OR group OR ADPrincipalGroupMembership)
 mailReplyToAddresses:("*") AND NOT mailFromAddresses:("*company.com") AND mailThreatType:("suspected, phishing")
+
 5. Recommended Response Actions
-Brief list of suggested IR or SOC playbook steps.
+Brief list playbooks steps including what searh Trend query must be used with playbook and how.
+
+
 `
 
 export async function POST(req: Request) {

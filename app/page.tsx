@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
-import { Send, Shield, Trash2, Loader2, Sparkles } from "lucide-react"
+import { Send, Shield, Trash2, Loader2, Sparkles,Crosshair,Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
@@ -42,13 +42,14 @@ export default function ChatPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary glow-effect float-effect">
-              <Shield className="w-6 h-6 text-primary-foreground" />
+              <Crosshair className="w-6 h-6 text-primary-foreground" />
+              {/* <img src="https://cybersamurai.co.uk/assets/images/trend_logo.png" alt="Trend Logo" /> */}
             </div>
             <div>
-              <h1 className="text-xl font-bold gradient-text">Chat with Trend</h1>
+              <h1 className="text-xl font-bold gradient-text">XDR Search Builder</h1>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                Cybersecurity Threat Analysis
+                Threat Hunting Companion for Trend Micro by CyberSamurai.co.uk
               </p>
             </div>
           </div>
@@ -60,8 +61,8 @@ export default function ChatPage() {
               onClick={handleNewChat}
               className="gap-2 bg-transparent hover:bg-primary/10 transition-all"
             >
-              <Trash2 className="w-4 h-4" />
-              New Chat
+              <Crosshair className="w-4 h-4" />
+              Start New Threat Hunt
             </Button>
           </div>
         </div>
@@ -73,22 +74,22 @@ export default function ChatPage() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
               <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6 glow-effect float-effect">
-                <Shield className="w-10 h-10 text-primary" />
+                {/* <Shield className="w-10 h-10 text-primary" /> */}
+                <img src="https://cybersamurai.co.uk/assets/images/trend_logo.png" alt="" className="Trend Logo" />
               </div>
-              <h2 className="text-3xl font-bold gradient-text mb-3">Welcome to Chat with Trend</h2>
+              <h2 className="text-3xl font-bold gradient-text mb-3">Threat Hunter Companion</h2>
               <p className="text-muted-foreground max-w-md leading-relaxed">
-                Analyze cybersecurity threats with AI-powered insights. Each query is automatically enhanced with threat
-                analysis context.
+                Describe what threat you are hunting and I will provide some context on how to search for it within VisionOne
               </p>
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 <span className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">
                   IOC Detection
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">
-                  MITRE ATT&CK
+                  Search Syntax
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">
-                  SOC Playbooks
+                  Playbook Ideas
                 </span>
               </div>
             </div>
