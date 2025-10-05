@@ -79,7 +79,7 @@ export default function ChatPage() {
               </div>
               <h2 className="text-3xl font-bold gradient-text mb-3">Threat Hunter Companion</h2>
               <p className="text-muted-foreground max-w-md leading-relaxed">
-                Describe what threat you are hunting and I will provide some context on how to search for it within VisionOne
+                Describe what threat you are hunting and I will try my best to provide some context on how to search for it using VisionOne
               </p>
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 <span className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">
@@ -176,7 +176,7 @@ export default function ChatPage() {
           </form>
           <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
             <Sparkles className="w-3 h-3" />
-            Press Enter to send, Shift+Enter for new line
+            Designed by <a href="https://cybersamurai.co.uk">CyberSamurai.co.uk</a> 
           </p>
         </div>
       </div>
