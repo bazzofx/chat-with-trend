@@ -17,7 +17,7 @@ RUN apt-get install nodejs -y
 RUN node -v && npm -v
 
 # Clone the repository
-RUN git clone https://github.com/bazzofx/chat-witht-trend.git /app
+RUN git clone https://github.com/bazzofx/chat-with-trend.git /app
 
 # Set working directory
 WORKDIR /app
