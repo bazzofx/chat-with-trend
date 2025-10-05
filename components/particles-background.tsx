@@ -86,7 +86,7 @@ export function ParticlesBackground() {
       ctx.globalCompositeOperation = "lighter"
 
       // spawn rate depends on width (so wide screens have more embers)
-      const spawnRatePerFrame = Math.max(1, Math.round((w / 5700) * (dt / 1.4))) // baseline
+      const spawnRatePerFrame = Math.max(1, Math.round((w / 5500) * (dt / 1.41))) // baseline
       for (let s = 0; s < spawnRatePerFrame; s++) {
         // spawn probabilistically to avoid huge spikes
         if (Math.random() < 0.9) spawnParticle()
