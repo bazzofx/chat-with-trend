@@ -49,7 +49,7 @@ export function ParticlesBackground() {
       const vx = (Math.random() - 0.5) * 0.8 // slight horizontal drift
       const vy = -upwardSpeed - Math.random() * 0.6 // negative = upward
 
-      const size = Math.random() * 3 + 1 // small embers
+      const size = Math.random() * 1 + 0.22 // small embers
       const maxLife = 800 + Math.random() * 900 // ms lifetime
 
       const color = Math.random() < 0.55 ? "yellow" : "red" // slightly more yellow
@@ -86,7 +86,7 @@ export function ParticlesBackground() {
       ctx.globalCompositeOperation = "lighter"
 
       // spawn rate depends on width (so wide screens have more embers)
-      const spawnRatePerFrame = Math.max(1, Math.round((w / 1200) * (dt / 16))) // baseline
+      const spawnRatePerFrame = Math.max(1, Math.round((w / 5700) * (dt / 1.4))) // baseline
       for (let s = 0; s < spawnRatePerFrame; s++) {
         // spawn probabilistically to avoid huge spikes
         if (Math.random() < 0.9) spawnParticle()

@@ -150,8 +150,8 @@ export default function ChatPage() {
 
       {/* Input Area */}
       <div className="border-t border-border glass-effect relative z-10">
-        <div className="container mx-auto px-4 py-4 max-w-4xl">
-          <form onSubmit={handleSubmit} className="flex gap-3">
+        <div className="container mx-auto px-4 py-4 max-w-4xl ">
+          <form onSubmit={handleSubmit} className="flex gap-3 ">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
