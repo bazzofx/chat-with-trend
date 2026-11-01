@@ -25,11 +25,11 @@ WORKDIR /app
 # Install npm dependencies
 RUN npm install --force  2>/dev/null
 
-# Set environment variable for API key
-ARG API_KEY
-ENV AI_GATEWAY_API_KEY=${API_KEY}
-# Create .env.local file with API_KEY
-RUN echo "AI_GATEWAY_API_KEY=${API_KEY}" > .env.local
+# Set environment variable for the OpenRouter API key
+ARG apiOpenRouterChatWithTrend
+ENV apiOpenRouterChatWithTrend=${apiOpenRouterChatWithTrend}
+# Create .env.local file with the OpenRouter API key
+RUN echo "apiOpenRouterChatWithTrend=${apiOpenRouterChatWithTrend}" > .env.local
 
 # Expose necessary ports
 EXPOSE 3003

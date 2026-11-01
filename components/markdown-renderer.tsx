@@ -7,13 +7,47 @@ interface MarkdownRendererProps {
   content: string
 }
 
-function childrenToString(children: React.ReactNode) {
-  // ReactMarkdown often passes an array of strings/ReactNodes. Convert to plain string.
-  if (typeof children === "string") return children
-  if (Array.isArray(children)) {
-    return children.map((c) => (typeof c === "string" ? c : "")).join("")
+function childrenToString(children: React.ReactNode): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children)
   }
+
+  if (Array.isArray(children)) {
+    return children.map(childrenToString).join("")
+  }
+
+  if (React.isValidElement(children)) {
+    return childrenToString((children.props as { children?: React.ReactNode }).children)
+  }
+
   return ""
+}
+
+function CodeBlock({ language, code }: { language: string; code: string }) {
+  return (
+    <div className="my-4 rounded-lg overflow-hidden border border-border/50 bg-muted/30">
+      <div className="px-4 py-2 bg-muted/50 border-b border-border/50 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500/60" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+            <div className="w-3 h-3 rounded-full bg-green-500/60" />
+          </div>
+          <span className="text-xs text-muted-foreground font-mono ml-2 capitalize">{language}</span>
+        </div>
+        {/* optional: you can add a copy button here later */}
+      </div>
+
+      <pre className="p-4 overflow-x-auto">
+        <code
+          className="font-mono text-sm text-foreground/90 whitespace-pre"
+          data-language={language}
+        >
+          {code}
+        </code>
+      </pre>
+    </div>
+  )
 }
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
@@ -48,53 +82,37 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
     ),
     li: ({ children }) => <li className="leading-relaxed">{children}</li>,
 
-    // Code (inline + block)
-    code: ({ inline, className, children, ...props }: any) => {
-      const raw = childrenToString(children)
-      const language = (className || "").replace("language-", "") || "code"
+    // Block code is wrapped in <pre> by react-markdown. Rendering the whole block
+    // here (instead of in `code`) keeps block-level tags out of paragraphs.
+    pre: ({ children }) => {
+      const child = React.Children.toArray(children)[0]
 
-      // Inline code
-      if (inline) {
+      if (!React.isValidElement(child)) {
         return (
-          <code
-            className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono text-sm border border-primary/20"
-            {...props}
-          >
-            {raw}
-          </code>
+          <pre className="my-4 p-4 overflow-x-auto rounded-lg border border-border/50 bg-muted/30">
+            {children}
+          </pre>
         )
       }
 
-      // Block code
-      // Trim leading/trailing newlines to avoid double-blank lines in render
-      const codeContent = raw.replace(/^\n+|\n+$/g, "")
+      const codeProps = child.props as { className?: string; children?: React.ReactNode }
+      const language = (codeProps.className || "").replace(/^language-/, "") || "code"
+      const code = childrenToString(codeProps.children).replace(/^\n+|\n+$/g, "")
 
-      return (
-        <div className="my-4 rounded-lg overflow-hidden border border-border/50 bg-muted/30">
-          <div className="px-4 py-2 bg-muted/50 border-b border-border/50 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              </div>
-              <span className="text-xs text-muted-foreground font-mono ml-2 capitalize">{language}</span>
-            </div>
-            {/* optional: you can add a copy button here later */}
-          </div>
-
-          <pre className="p-4 overflow-x-auto">
-            <code
-              className="font-mono text-sm text-foreground/90 whitespace-pre"
-              data-language={language}
-              {...props}
-            >
-              {codeContent}
-            </code>
-          </pre>
-        </div>
-      )
+      return <CodeBlock language={language} code={code} />
     },
+
+    // Inline code only; block code is handled by `pre` above.
+    code: ({ className, children }) => (
+      <code
+        className={
+          className ||
+          "px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono text-sm border border-primary/20"
+        }
+      >
+        {children}
+      </code>
+    ),
 
     // Blockquotes
     blockquote: ({ children }) => (

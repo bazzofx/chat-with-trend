@@ -1,7 +1,28 @@
 import { consumeStream, convertToModelMessages, streamText, type UIMessage } from "ai"
+import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 
 
 export const maxDuration = 30
+
+const apiKey = process.env.OPENROUTER_API_KEY || process.env.apiOpenRouterChatWithTrend
+
+if (!apiKey) {
+  throw new Error(
+    "OPENROUTER_API_KEY (or apiOpenRouterChatWithTrend) environment variable is missing",
+  )
+}
+
+const DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o"
+const modelId = process.env.OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL
+
+const openrouter = createOpenRouter({
+  apiKey,
+  compatibility: "strict",
+  headers: {
+    "HTTP-Referer": process.env.OPENROUTER_SITE_URL ?? "https://cybersamurai.co.uk",
+    "X-Title": "XDR Search Builder",
+  },
+})
 
 const THREAT_ANALYSIS_SYSTEM_PROMPT = `
 # Perform the following actions based on the user query:
@@ -19,9 +40,15 @@ Identify Indicators of Compromise (IOCs) based on the user query and provide wit
 3) Structure between 3 and 5 detection logic only based on Trend XDR query syntax properties.
 
 
-# Trend XDR query syntax properties
+#IMPORTANT GUIDELINES
+All Trend XDR queries MUST strictly adhere to the field names, operators, 
+syntax, and query structures demonstrated in the provided examples. 
+Do not invent, assume, modify, or introduce any fields or syntax that are not explicitly 
+present in the approved examples. Treat these examples as the exclusive source of truth for query construction.
+If a requested query cannot be constructed using the demonstrated syntax and fields, 
+clearly state the limitation rather than generating an alternative or unsupported query.
 
-## Allowed Logical Operators for Detection Queries
+## Only the below operators Allowed Logical Operators for Detection Queries
 AND, OR, AND NOT
 ## Search Field Properties
 🔹 Endpoint Activity Data
@@ -162,6 +189,35 @@ rawDstPort
    Note: The AND operator has a higher precedence than OR, but the precedence can be overridden by grouping the operators in parentheses.
 
 ❌ Do not use: CONTAINS, DO NOT CONTAINS, IN, NOT IN
+❌ Do not use: UserName, networkConnection,FilePath,command
+
+Example Queries
+
+Purpose:n0n Ransomware - C2 Beacon to ntpsync.io
+Query:eventSubId:301 AND hostName:"ntpsync.io"
+
+Purpose:n0n Ransomware - Encrypted File Extension (.n0n)
+Query:(eventSubId:106 AND objectFilePath:"*.n0n")
+
+Purpose:Malware related detection query
+Query:(malName:*SIDEEYE* OR malName:*X.JSP* OR malName:*U.JSP*) AND eventName:MALWARE_DETECTION
+
+
+Purpose:Scheduled Task Execution of REMCOS Loader via svchost
+Query:eventSubId:2 AND (processCmd:(*\\ProgramData\\nano_handler\\Blue_Scanner.exe*) OR objectFilePath:(*\\ProgramData\\nano_handler\\Blue_Scanner.exe*)) AND (parentCmd:(*svchost.exe*) OR parentFilePath:(*\\svchost.exe))
+
+Purpose:Possible replay attack
+Query:eventName:IDENTITY_IAM_SIGN_INS AND principalName:[@domain.com] AND requestMethod:"*Previously satisfied*" and rawDataStr:*unbound*
+
+Purpose:Suspicious mailbox-hiding rule
+Query:eventName:COLLABORATION_ACTIVITY and actionName:("New-InboxRule" OR "Set-InboxRule") AND parameters:(*Archive* or *MarkAsRead* OR *StopProcessingRules*)
+
+Purpose:Detect execution of suspicious PowerShell scripts written by npm package processes.
+Query:eventId:2 AND parentFilePath:(*node.exe OR *npm* OR *apex*.exe) AND processCmd:(*powershell* AND *EncodedCommand*)
+
+Purpose:Detection of Bun runtime execution potentially triggered by malicious Node.js process.
+Query:eventId:2 AND parentCmd:("node setup.mjs" OR "node setup.mjs") AND (processFilePath:*bun* OR processCmd:*node_modules*)
+
 
 
 # Response Format
@@ -215,7 +271,7 @@ export async function POST(req: Request) {
   ]
 
   const result = streamText({
-    model: "openai/gpt-4o",
+    model: openrouter(modelId),
     messages: messagesWithSystem,
     abortSignal: req.signal,
     temperature: 0.7,
