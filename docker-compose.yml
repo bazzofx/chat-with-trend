@@ -1,0 +1,33 @@
+services:
+  chat-with-trend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chat-with-trend:latest
+    container_name: chat-with-trend
+    init: true
+    restart: unless-stopped
+
+    ports:
+      - "4987:4987"
+
+    environment:
+      NODE_ENV: production
+      # Standard OpenRouter key. apiOpenRouterChatWithTrend also works.
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      apiOpenRouterChatWithTrend: ${apiOpenRouterChatWithTrend:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openai/gpt-4o}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-https://cybersamurai.co.uk}
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4987/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -15,19 +15,41 @@ $env:OPENROUTER_API_KEY="sk-or-v1-..."
 
 The existing `apiOpenRouterChatWithTrend` name is also accepted as a fallback. The route fails fast if neither is set, so the key must be available when running `next build` as well as at runtime. The default model is `openai/gpt-4o`; override it with the `OPENROUTER_MODEL` environment variable.
 
-For Docker, pass the key as a build argument:
-
-```bash
-docker build --build-arg apiOpenRouterChatWithTrend="sk-or-v1-..." -t chat-with-trend .
-```
-
 ## Local development
 
 ```bash
 npm run dev
 ```
 
-The dev server listens on `http://localhost:4000` (port 3000 is often reserved by Windows/Hyper-V).
+The dev server listens on `http://localhost:4987`.
+
+## Docker Compose (production)
+
+Create a `.env` file in the project root with your OpenRouter key (never commit it):
+
+```dotenv
+OPENROUTER_API_KEY=sk-or-v1-...
+# optional
+OPENROUTER_MODEL=openai/gpt-4o
+```
+
+Build and start the container:
+
+```bash
+docker compose up -d --build
+```
+
+The app will be available at `http://localhost:4987`. The first start builds the Next.js app, so allow a minute or two before the health check turns healthy.
+
+Useful commands:
+
+```bash
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+You can use `apiOpenRouterChatWithTrend` instead of `OPENROUTER_API_KEY` in `.env`; the app accepts either.
 
 ## Deployment
 

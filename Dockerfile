@@ -1,38 +1,21 @@
-# Use Ubuntu as base image
-FROM ubuntu:20.04
+# Use a small, supported Node.js runtime
+FROM node:22-alpine
 
-# Set environment variables to avoid interactive prompts
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
-RUN apt update -y && apt upgrade -y  2>/dev/null
-# Services for troubleshooting
-RUN apt install nano systemctl net-tools -y
-#Install Git
-RUN apt install git -y
-#Install NextJS + Latest Node Versions
-RUN apt install curl -y
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install nodejs -y
-RUN node -v && npm -v
-
-# Clone the repository
-RUN git clone https://github.com/bazzofx/chat-with-trend.git /app
-
-# Set working directory
 WORKDIR /app
 
-# Install npm dependencies
-RUN npm install --force  2>/dev/null
+# Compatibility layer for native packages on Alpine
+RUN apk add --no-cache libc6-compat
 
-# Set environment variable for the OpenRouter API key
-ARG apiOpenRouterChatWithTrend
-ENV apiOpenRouterChatWithTrend=${apiOpenRouterChatWithTrend}
-# Create .env.local file with the OpenRouter API key
-RUN echo "apiOpenRouterChatWithTrend=${apiOpenRouterChatWithTrend}" > .env.local
+# Install dependencies first for better layer caching
+COPY package.json package-lock.json ./
+RUN npm ci --legacy-peer-deps
 
-# Expose necessary ports
-EXPOSE 3003
+# Copy the application source (secrets are excluded via .dockerignore)
+COPY . .
 
-# Define startup script to start both Nginx and the app
-CMD  npm run production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+EXPOSE 4987
+
+# Build once on first container start; later restarts reuse .next
+CMD ["sh", "-c", "if [ ! -f .next/BUILD_ID ]; then npm run build; fi && npm start"]
